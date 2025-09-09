@@ -16,26 +16,22 @@ public class TarefaController {
     @Autowired
     private TarefaRepository tarefaRepository;
 
-    // criar uma nova tarefa
     @PostMapping
     public Tarefa criarTarefa(@RequestBody Tarefa tarefa) {
         return tarefaRepository.save(tarefa);
     }
 
-    // listar todas as tarefas
     @GetMapping
     public List<Tarefa> listarTarefas() {
         return tarefaRepository.findAll();
     }
 
-    // buscar tarefa por ID
     @GetMapping("/{id}")
     public ResponseEntity<Tarefa> buscarPorId(@PathVariable Long id) {
         Optional<Tarefa> tarefa = tarefaRepository.findById(id);
         return tarefa.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // atualizar uma tarefa
     @PutMapping("/{id}")
     public ResponseEntity<Tarefa> atualizarTarefa(@PathVariable Long id, @RequestBody Tarefa tarefaAtualizada) {
         return tarefaRepository.findById(id).map(tarefa -> {
@@ -46,12 +42,13 @@ public class TarefaController {
         }).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // remover uma tarefa
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarTarefa(@PathVariable Long id) {
-        return tarefaRepository.findById(id).map(tarefa -> {
-            tarefaRepository.delete(tarefa);
+    public ResponseEntity<?> deletarTarefa(@PathVariable Long id) {
+        if (tarefaRepository.existsById(id)) {
+            tarefaRepository.deleteById(id);
             return ResponseEntity.noContent().build();
-        }).orElseGet(() -> ResponseEntity.notFound().build());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
