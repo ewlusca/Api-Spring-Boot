@@ -29,21 +29,24 @@ public class TarefaController {
     @GetMapping("/{id}")
     public ResponseEntity<Tarefa> buscarPorId(@PathVariable Long id) {
         Optional<Tarefa> tarefa = tarefaRepository.findById(id);
-        return tarefa.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return tarefa.map(ResponseEntity::ok)
+                     .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Tarefa> atualizarTarefa(@PathVariable Long id, @RequestBody Tarefa tarefaAtualizada) {
-        return tarefaRepository.findById(id).map(tarefa -> {
-            tarefa.setNome(tarefaAtualizada.getNome());
-            tarefa.setDataEntrega(tarefaAtualizada.getDataEntrega());
-            tarefa.setResponsavel(tarefaAtualizada.getResponsavel());
-            return ResponseEntity.ok(tarefaRepository.save(tarefa));
-        }).orElseGet(() -> ResponseEntity.notFound().build());
+        return tarefaRepository.findById(id)
+                .map(tarefa -> {
+                    tarefa.setNome(tarefaAtualizada.getNome());
+                    tarefa.setDataEntrega(tarefaAtualizada.getDataEntrega());
+                    tarefa.setResponsavel(tarefaAtualizada.getResponsavel());
+                    return ResponseEntity.ok(tarefaRepository.save(tarefa));
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletarTarefa(@PathVariable Long id) {
+    public ResponseEntity<Void> deletarTarefa(@PathVariable Long id) {
         if (tarefaRepository.existsById(id)) {
             tarefaRepository.deleteById(id);
             return ResponseEntity.noContent().build();
